@@ -1,0 +1,174 @@
+// TribeTaxi Database Schema
+// Ride-hailing platform for Jharkhand
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  phone     String   @unique
+  role      UserRole @default(RIDER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Rider specific
+  rides     Ride[]
+  
+  // Driver specific
+  driver    Driver?
+  
+  @@map("users")
+}
+
+model Driver {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id])
+  
+  licenseNo   String
+  isVerified  Boolean  @default(false)
+  isOnline    Boolean  @default(false)
+  currentLat  Float?
+  currentLng  Float?
+  
+  vehicle     Vehicle?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("drivers")
+}
+
+model Vehicle {
+  id        String   @id @default(cuid())
+  driverId  String   @unique
+  driver    Driver   @relation(fields: [driverId], references: [id])
+  
+  type      VehicleType
+  make      String
+  model     String
+  year      Int
+  color     String
+  plateNo   String   @unique
+  
+  capacity  Int
+  isAC      Boolean  @default(false)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("vehicles")
+}
+
+model Ride {
+  id              String      @id @default(cuid())
+  riderId        String
+  rider          User        @relation(fields: [riderId], references: [id])
+  
+  driverId        String?
+  
+  status          RideStatus  @default(REQUESTED)
+  
+  pickupLat       Float
+  pickupLng       Float
+  pickupAddress   String
+  
+  dropLat         Float
+  dropLng         Float
+  dropAddress     String
+  
+  estimatedFare   Float
+  actualFare      Float?
+  distance        Float?     // in km
+  duration        Int?       // in minutes
+  
+  scheduledAt     DateTime?
+  startedAt       DateTime?
+  completedAt     DateTime?
+  cancelledAt     DateTime?
+  
+  paymentMethod   PaymentMethod
+  paymentStatus   PaymentStatus @default(PENDING)
+  
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  
+  @@map("rides")
+}
+
+model City {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  state       String   @default("Jharkhand")
+  isActive    Boolean  @default(true)
+  
+  // Geo boundaries for service area
+  bounds      Json?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("cities")
+}
+
+model FareSettings {
+  id            String   @id @default(cuid())
+  cityId        String
+  vehicleType   VehicleType
+  baseFare      Float
+  perKmRate     Float
+  perMinRate    Float
+  minFare       Float
+  
+  isActive      Boolean  @default(true)
+  
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@unique([cityId, vehicleType])
+  @@map("fare_settings")
+}
+
+enum UserRole {
+  RIDER
+  DRIVER
+  ADMIN
+}
+
+enum VehicleType {
+  AUTO_RICKSHAW
+  CAR_ECONOMY
+  CAR_PREMIUM
+  BIKE
+}
+
+enum RideStatus {
+  REQUESTED
+  ACCEPTED
+  ARRIVED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentMethod {
+  CASH
+  UPI
+  CARD
+  WALLET
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}

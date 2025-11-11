@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TribeTaxi Test</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'hsl(var(--background))',
+                        foreground: 'hsl(var(--foreground))',
+                        primary: 'hsl(var(--primary))',
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer base {
+            :root {
+                --background: oklch(1 0 0);
+                --foreground: oklch(0.145 0 0);
+                --primary: oklch(0.205 0 0);
+            }
+        }
+    </style>
+</head>
+<body class="bg-background text-foreground">
+    <div class="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 p-8">
+        <h1 class="text-4xl font-bold text-green-600 mb-4">TribeTaxi Test</h1>
+        <p class="text-xl text-gray-600 mb-8">CSS is working!</p>
+        <button class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg">
+            Test Button
+        </button>
+    </div>
+</body>
+</html>

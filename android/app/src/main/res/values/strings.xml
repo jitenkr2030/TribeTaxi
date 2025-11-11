@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">TribeTaxi</string>
+    <string name="title_activity_main">TribeTaxi</string>
+    <string name="package_name">com.tribetaxi.app</string>
+    <string name="custom_url_scheme">com.tribetaxi.app</string>
+</resources>
